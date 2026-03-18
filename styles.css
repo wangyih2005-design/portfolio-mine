@@ -1525,8 +1525,16 @@ body.lang-zh [data-lang-flex="zh"], body.lang-en [data-lang-flex="en"] { display
 @media (max-width: 640px) {
   .sprite-wrap { width: 200px; height: 200px; }
   .pixel-sprite { width: 150px; height: 150px; }
-  .hero-title { font-size: clamp(38px, 12vw, 56px); }
-  .section-title { font-size: clamp(32px, 10vw, 42px); }
+  .hero-title {
+    font-size: clamp(28px, 9vw, 42px);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+  }
+  .section-title {
+    font-size: clamp(20px, 7vw, 30px);
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+  }
   .detail-title { font-size: clamp(30px, 10vw, 42px); }
   .project-area {
     padding: 14px;
@@ -1549,6 +1557,16 @@ body.lang-zh [data-lang-flex="zh"], body.lang-en [data-lang-flex="en"] { display
 @media (max-width: 420px) {
   .hero, .section { padding-inline: 10px; }
   .detail-main { padding-inline: 10px; }
+  .hero-title {
+    font-size: clamp(24px, 8vw, 32px);
+    line-height: 1.18;
+    letter-spacing: 0.03em;
+  }
+  .section-title {
+    font-size: clamp(18px, 6.2vw, 24px);
+    line-height: 1.22;
+    letter-spacing: 0.03em;
+  }
   .lang-toggle button { min-width: 48px; padding: 8px 10px; }
   .bgm-credit {
     left: 8px;
