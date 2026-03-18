@@ -1543,6 +1543,55 @@ body.lang-zh [data-lang-flex="zh"], body.lang-en [data-lang-flex="en"] { display
     font-size: clamp(20px, 6.8vw, 28px);
     line-height: 1.2;
   }
+  .detail-screen {
+    gap: 14px;
+    padding: 12px;
+  }
+  .detail-toolbar {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .detail-back {
+    min-height: 34px;
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .detail-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+  .detail-nav-link {
+    min-height: 34px;
+    padding: 8px 6px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .detail-primary,
+  .detail-summary-card,
+  .detail-process-card,
+  .detail-sidebar-panel,
+  .detail-pages-card {
+    padding: 14px;
+  }
+  .detail-cover {
+    padding: 6px;
+    border-width: 3px;
+    border-radius: 14px;
+  }
+  .detail-pages-flow {
+    gap: 10px;
+  }
+  .detail-page-shot {
+    padding: 6px;
+    border-width: 2px;
+    border-radius: 12px;
+  }
+  .detail-page-shot img {
+    border-radius: 6px;
+  }
   .project-area {
     padding: 14px;
     gap: 16px;
@@ -1586,6 +1635,46 @@ body.lang-zh [data-lang-flex="zh"], body.lang-en [data-lang-flex="en"] { display
     font-size: 9px;
     letter-spacing: 0.04em;
   }
+  .detail-screen {
+    gap: 12px;
+    padding: 10px;
+  }
+  .detail-toolbar {
+    gap: 8px;
+  }
+  .detail-back {
+    min-height: 32px;
+    padding: 7px 9px;
+    font-size: 9px;
+  }
+  .detail-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .detail-nav-link {
+    min-height: 32px;
+    padding: 7px 4px;
+    font-size: 9px;
+    letter-spacing: 0.03em;
+  }
+  .detail-primary,
+  .detail-summary-card,
+  .detail-process-card,
+  .detail-sidebar-panel,
+  .detail-pages-card {
+    padding: 12px;
+  }
+  .detail-cover {
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .detail-pages-flow {
+    gap: 8px;
+  }
+  .detail-page-shot {
+    padding: 4px;
+    border-radius: 10px;
+  }
   .lang-toggle button { min-width: 48px; padding: 8px 10px; }
   .bgm-credit {
     left: 8px;
@@ -1610,6 +1699,4 @@ body.lang-zh [data-lang-flex="zh"], body.lang-en [data-lang-flex="en"] { display
   .gallery-card { flex-basis: min(280px, 86vw); min-height: 430px; }
   .gallery-stage { font-size: 11px; padding: 7px 8px; }
   .gallery-tags { gap: 8px; }
-  .detail-back,
-  .detail-nav-link { width: 100%; }
 }
