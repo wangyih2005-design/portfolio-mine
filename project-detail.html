@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Detail | Wang Yihan</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="lang-zh detail-page is-ready">
+  <div class="page-shell">
+    <canvas class="pixel-rain" id="pixelRain" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="lang-toggle is-visible" id="langToggle">
+      <button type="button" data-lang-btn="zh" class="is-active">CN</button>
+      <button type="button" data-lang-btn="en">EN</button>
+    </div>
+
+    <button type="button" class="audio-toggle is-visible" id="audioToggle" aria-label="Toggle background music" title="Toggle background music">
+      <span class="audio-toggle__icon" aria-hidden="true">
+        <span class="audio-toggle__speaker"></span>
+        <span class="audio-toggle__wave audio-toggle__wave--one"></span>
+        <span class="audio-toggle__wave audio-toggle__wave--two"></span>
+      </span>
+    </button>
+
+    <audio id="bgmAudio" loop preload="none"></audio>
+
+    <aside class="bgm-credit">
+      <p data-lang="zh">关于 BGM：选用了我最喜欢的《星露谷物语》序曲（Overture）。这首曲子陪伴我度过了很多创作时光，希望它的治愈感也能带给你良好的观看体验。</p>
+      <p data-lang="en">About the BGM: I chose my favorite Stardew Valley track, Overture. It has accompanied many of my creative hours, and I hope its gentle feeling brings you a warm viewing experience too.</p>
+      <p class="bgm-credit__note">Music by ConcernedApe | 感谢这位天才开发者的慷慨授权。</p>
+    </aside>
+
+    <main class="detail-main">
+      <div class="detail-cabinet">
+        <div class="detail-marquee">
+          <span id="detailMarquee">Stage Select Detail</span>
+        </div>
+
+        <div class="detail-bezel">
+          <section class="detail-screen">
+            <div class="detail-toolbar">
+              <a class="detail-back" href="./index.html?entered=1">
+                <span data-lang="zh">Back To Lobby</span>
+                <span data-lang="en">Back To Lobby</span>
+              </a>
+              <div class="detail-nav" id="detailNav"></div>
+            </div>
+
+            <article class="detail-primary detail-primary--single">
+              <div class="detail-stage-row">
+                <span class="detail-stage-chip detail-stage-chip--plain" id="detailStageChip">Stage 01</span>
+                <span class="detail-stage-chip" data-lang="zh">街机案例详情</span>
+                <span class="detail-stage-chip" data-lang="en">Arcade Case File</span>
+              </div>
+
+              <div class="detail-title-wrap">
+                <h1 class="detail-title" data-lang="zh" id="detailTitleZh"></h1>
+                <h1 class="detail-title" data-lang="en" id="detailTitleEn"></h1>
+                <p class="detail-subtitle" data-lang="zh" id="detailSubtitleZh"></p>
+                <p class="detail-subtitle" data-lang="en" id="detailSubtitleEn"></p>
+              </div>
+
+              <figure class="detail-cover">
+                <img id="detailCover" alt="">
+              </figure>
+
+              <section class="detail-sidebar-panel">
+                <p class="detail-kicker" data-lang="zh">Project Meta</p>
+                <p class="detail-kicker" data-lang="en">Project Meta</p>
+                <div class="detail-sidebar-meta detail-sidebar-meta--inline">
+                  <div class="detail-meta-item">
+                    <span class="detail-meta-label" data-lang="zh">Role</span>
+                    <span class="detail-meta-label" data-lang="en">Role</span>
+                    <strong class="detail-meta-value" data-lang="zh" id="detailRoleZh"></strong>
+                    <strong class="detail-meta-value" data-lang="en" id="detailRoleEn"></strong>
+                  </div>
+                  <div class="detail-meta-item">
+                    <span class="detail-meta-label" data-lang="zh">Duration</span>
+                    <span class="detail-meta-label" data-lang="en">Duration</span>
+                    <strong class="detail-meta-value" data-lang="zh" id="detailDurationZh"></strong>
+                    <strong class="detail-meta-value" data-lang="en" id="detailDurationEn"></strong>
+                  </div>
+                  <div class="detail-meta-item">
+                    <span class="detail-meta-label" data-lang="zh">Tags</span>
+                    <span class="detail-meta-label" data-lang="en">Tags</span>
+                    <div class="detail-tags" data-lang-flex="zh" id="detailTagsZh"></div>
+                    <div class="detail-tags" data-lang-flex="en" id="detailTagsEn"></div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="detail-grid">
+                <section class="detail-summary-card">
+                  <p class="detail-kicker" data-lang="zh">Project Summary</p>
+                  <p class="detail-kicker" data-lang="en">Project Summary</p>
+                  <p class="detail-copy" data-lang="zh" id="detailSummaryZh"></p>
+                  <p class="detail-copy" data-lang="en" id="detailSummaryEn"></p>
+                </section>
+
+                <section class="detail-summary-card">
+                  <p class="detail-kicker" data-lang="zh">Challenge</p>
+                  <p class="detail-kicker" data-lang="en">Challenge</p>
+                  <p class="detail-copy" data-lang="zh" id="detailChallengeZh"></p>
+                  <p class="detail-copy" data-lang="en" id="detailChallengeEn"></p>
+                </section>
+              </div>
+
+              <section class="detail-process-card">
+                <p class="detail-kicker" data-lang="zh">Design Response</p>
+                <p class="detail-kicker" data-lang="en">Design Response</p>
+                <p class="detail-copy" data-lang="zh" id="detailSolutionZh"></p>
+                <p class="detail-copy" data-lang="en" id="detailSolutionEn"></p>
+              </section>
+
+              <section class="detail-sidebar-panel">
+                <p class="detail-kicker" data-lang="zh">Outcome</p>
+                <p class="detail-kicker" data-lang="en">Outcome</p>
+                <ul class="detail-bullets" data-lang="zh" id="detailOutcomeZh"></ul>
+                <ul class="detail-bullets" data-lang="en" id="detailOutcomeEn"></ul>
+              </section>
+
+              <section class="detail-pages-card">
+                <div class="detail-pages-head">
+                  <p class="detail-kicker" data-lang="zh">Full Portfolio Pages</p>
+                  <p class="detail-kicker" data-lang="en">Full Portfolio Pages</p>
+                </div>
+                <div class="detail-pages-flow" id="detailPagesFlow"></div>
+              </section>
+            </article>
+          </section>
+        </div>
+
+        <div class="detail-controls" aria-hidden="true">
+          <div class="detail-controls-copy">
+            <strong>Press Start To Continue</strong>
+            <span data-lang="zh">项目详情已接入街机边框系统</span>
+            <span data-lang="en">Project detail now lives inside the arcade frame</span>
+          </div>
+
+          <div class="cabinet-buttons">
+            <span class="cabinet-button">A</span>
+            <span class="cabinet-button">B</span>
+            <span class="cabinet-button">C</span>
+          </div>
+        </div>
+
+        <div class="cabinet-base"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="./portfolio-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="./project-detail.js"></script>
+</body>
+</html>
