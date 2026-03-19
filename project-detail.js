@@ -180,11 +180,14 @@ function createDetailShot(src, index, project) {
   img.loading = "lazy";
   img.decoding = "async";
   img.fetchPriority = index < DETAIL_BATCH_SIZE ? "high" : "low";
+  img.style.opacity = "0";
+  img.style.transition = "opacity .24s ease";
+  figure.appendChild(img);
 
   img.addEventListener("load", () => {
     figure.classList.remove("is-loading", "is-error");
     skeleton.remove();
-    figure.appendChild(img);
+    img.style.opacity = "1";
   }, { once: true });
 
   img.addEventListener("error", () => {
@@ -199,7 +202,7 @@ function createDetailShot(src, index, project) {
     if (img.naturalWidth > 0) {
       figure.classList.remove("is-loading", "is-error");
       skeleton.remove();
-      figure.appendChild(img);
+      img.style.opacity = "1";
     } else {
       figure.classList.remove("is-loading");
       figure.classList.add("is-error");
