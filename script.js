@@ -29,7 +29,7 @@ let snowRows = 10;
 let snowCell = 14;
 let clearingSnow = false;
 const snowPalette = ["255, 255, 255", "244, 244, 244", "232, 232, 232", "218, 218, 218", "198, 198, 198"];
-const BGM_SRC = "./audio/stardew-valley.mp4";
+const BGM_SRC = "./audio/stardew-valley.mp3";
 const BGM_STATE_KEY = "portfolio-bgm";
 const BGM_TIME_KEY = "portfolio-bgm-time";
 
