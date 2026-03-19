@@ -1,4 +1,4 @@
-const siteData = window.PORTFOLIO_DATA || { projects: [] };
+﻿const siteData = window.PORTFOLIO_DATA || { projects: [] };
 const langButtons = document.querySelectorAll("[data-lang-btn]");
 const audioToggle = document.getElementById("audioToggle");
 const bgmAudio = document.getElementById("bgmAudio");
@@ -131,7 +131,7 @@ function renderProject(project) {
   document.getElementById("detailChallengeEn").textContent = project.challengeEn || project.overviewEn;
   document.getElementById("detailSolutionZh").textContent = project.solutionZh || project.overviewZh;
   document.getElementById("detailSolutionEn").textContent = project.solutionEn || project.overviewEn;
-  document.getElementById("detailRoleZh").textContent = project.roleZh || "UI / 交互设计";
+  document.getElementById("detailRoleZh").textContent = project.roleZh || "UI / 浜や簰璁捐";
   document.getElementById("detailRoleEn").textContent = project.roleEn || "UI / Interaction Design";
   document.getElementById("detailDurationZh").textContent = project.durationZh || "-";
   document.getElementById("detailDurationEn").textContent = project.durationEn || "-";
@@ -169,12 +169,17 @@ function createDetailShot(src, index, project) {
   skeleton.className = "detail-page-skeleton";
   figure.appendChild(skeleton);
 
+  const errorMarkup = `
+      <strong>Image unavailable</strong>
+      <span data-lang="zh">当前图片加载失败，请刷新或稍后重试。</span>
+      <span data-lang="en">This image could not be loaded. Please refresh and try again.</span>
+    `;
+
   const img = document.createElement("img");
   img.alt = `${project.titleEn} page ${index + 1}`;
   img.loading = "lazy";
   img.decoding = "async";
   img.fetchPriority = index < DETAIL_BATCH_SIZE ? "high" : "low";
-  img.src = src;
 
   img.addEventListener("load", () => {
     figure.classList.remove("is-loading", "is-error");
@@ -185,12 +190,22 @@ function createDetailShot(src, index, project) {
   img.addEventListener("error", () => {
     figure.classList.remove("is-loading");
     figure.classList.add("is-error");
-    skeleton.innerHTML = `
-      <strong>Image unavailable</strong>
-      <span data-lang="zh">当前图片加载失败，请刷新或稍后重试。</span>
-      <span data-lang="en">This image could not be loaded. Please refresh and try again.</span>
-    `;
+    skeleton.innerHTML = errorMarkup;
   }, { once: true });
+
+  img.src = src;
+
+  if (img.complete) {
+    if (img.naturalWidth > 0) {
+      figure.classList.remove("is-loading", "is-error");
+      skeleton.remove();
+      figure.appendChild(img);
+    } else {
+      figure.classList.remove("is-loading");
+      figure.classList.add("is-error");
+      skeleton.innerHTML = errorMarkup;
+    }
+  }
 
   return figure;
 }
@@ -372,3 +387,4 @@ window.addEventListener("resize", resizeCanvas);
 langButtons.forEach((button) => {
   button.addEventListener("click", () => setLanguage(button.dataset.langBtn));
 });
+
