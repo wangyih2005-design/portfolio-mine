@@ -15,6 +15,20 @@ const snowPalette = ["255, 255, 255", "244, 244, 244", "232, 232, 232", "218, 21
 const BGM_SRC = "./audio/stardew-valley.mp3";
 const BGM_STATE_KEY = "portfolio-bgm";
 const BGM_TIME_KEY = "portfolio-bgm-time";
+const DETAIL_BATCH_SIZE = 3;
+const animationLib = window.gsap || null;
+
+let activeProject = null;
+let renderedPageCount = 0;
+let loadMoreObserver = null;
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
 
 function resizeCanvas() {
   rainCanvas.width = window.innerWidth;
@@ -24,12 +38,12 @@ function resizeCanvas() {
   settledSnow = Array.from({ length: snowCols }, () => []);
   clearingSnow = false;
   rainDrops = Array.from({ length: Math.max(24, Math.floor(window.innerWidth / 50)) }, () => ({
-    x: gsap.utils.random(0, rainCanvas.width),
-    y: gsap.utils.random(-rainCanvas.height, rainCanvas.height),
+    x: randomBetween(0, rainCanvas.width),
+    y: randomBetween(-rainCanvas.height, rainCanvas.height),
     size: snowCell,
-    speed: gsap.utils.random(0.45, 2.9),
-    alpha: gsap.utils.random(0.08, 0.18),
-    color: gsap.utils.random(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"])
+    speed: randomBetween(0.45, 2.9),
+    alpha: randomBetween(0.08, 0.18),
+    color: pickRandom(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"])
   }));
 }
 
@@ -45,14 +59,14 @@ function animateRain() {
       drop.y = targetY;
       if (settledSnow[col].length < snowRows) {
         settledSnow[col].push({
-          color: gsap.utils.random(snowPalette),
-          alpha: gsap.utils.random(0.16, 0.28)
+          color: pickRandom(snowPalette),
+          alpha: randomBetween(0.16, 0.28)
         });
       }
-      drop.y = -drop.size - gsap.utils.random(0, rainCanvas.height * 0.2);
-      drop.x = gsap.utils.random(0, rainCanvas.width);
-      drop.alpha = gsap.utils.random(0.08, 0.18);
-      drop.color = gsap.utils.random(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"]);
+      drop.y = -drop.size - randomBetween(0, rainCanvas.height * 0.2);
+      drop.x = randomBetween(0, rainCanvas.width);
+      drop.alpha = randomBetween(0.08, 0.18);
+      drop.color = pickRandom(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"]);
     }
 
     rainCtx.fillStyle = `rgba(${drop.color}, ${drop.alpha})`;
@@ -71,10 +85,10 @@ function animateRain() {
   const tallestStack = settledSnow.length ? Math.max(...settledSnow.map((stack) => stack.length)) : 0;
   if (!clearingSnow && tallestStack >= snowRows) {
     clearingSnow = true;
-    gsap.delayedCall(0.35, () => {
+    window.setTimeout(() => {
       settledSnow = Array.from({ length: snowCols }, () => []);
       clearingSnow = false;
-    });
+    }, 350);
   }
 
   requestAnimationFrame(animateRain);
@@ -96,6 +110,9 @@ function getProject() {
 }
 
 function renderProject(project) {
+  activeProject = project;
+  renderedPageCount = 0;
+
   const detailCover = document.getElementById("detailCover");
   const detailMarquee = document.getElementById("detailMarquee");
   const detailStageChip = document.getElementById("detailStageChip");
@@ -121,16 +138,17 @@ function renderProject(project) {
 
   detailCover.src = project.cover;
   detailCover.alt = project.titleEn;
+  detailCover.decoding = "async";
+  detailCover.fetchPriority = "high";
 
   document.getElementById("detailTagsZh").innerHTML = (project.tagsZh || []).map((tag) => `<span class="gallery-chip">${tag}</span>`).join("");
   document.getElementById("detailTagsEn").innerHTML = (project.tagsEn || []).map((tag) => `<span class="gallery-chip">${tag}</span>`).join("");
   document.getElementById("detailOutcomeZh").innerHTML = (project.outcomeZh || []).map((item) => `<li>${item}</li>`).join("");
   document.getElementById("detailOutcomeEn").innerHTML = (project.outcomeEn || []).map((item) => `<li>${item}</li>`).join("");
-  document.getElementById("detailPagesFlow").innerHTML = (project.pages || []).map((src, index) => `
-    <figure class="detail-page-shot">
-      <img src="${src}" alt="${project.titleEn} page ${index + 1}" loading="lazy">
-    </figure>
-  `).join("");
+  document.getElementById("detailPagesFlow").innerHTML = "";
+  renderNextPageBatch();
+  syncLoadMoreButton();
+  initLoadMoreObserver();
 }
 
 function renderNav(currentProject) {
@@ -143,8 +161,94 @@ function renderNav(currentProject) {
   `).join("");
 }
 
+function createDetailShot(src, index, project) {
+  const figure = document.createElement("figure");
+  figure.className = "detail-page-shot is-loading";
+
+  const skeleton = document.createElement("div");
+  skeleton.className = "detail-page-skeleton";
+  figure.appendChild(skeleton);
+
+  const img = document.createElement("img");
+  img.alt = `${project.titleEn} page ${index + 1}`;
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.fetchPriority = index < DETAIL_BATCH_SIZE ? "high" : "low";
+  img.src = src;
+
+  img.addEventListener("load", () => {
+    figure.classList.remove("is-loading", "is-error");
+    skeleton.remove();
+    figure.appendChild(img);
+  }, { once: true });
+
+  img.addEventListener("error", () => {
+    figure.classList.remove("is-loading");
+    figure.classList.add("is-error");
+    skeleton.innerHTML = `
+      <strong>Image unavailable</strong>
+      <span data-lang="zh">当前图片加载失败，请刷新或稍后重试。</span>
+      <span data-lang="en">This image could not be loaded. Please refresh and try again.</span>
+    `;
+  }, { once: true });
+
+  return figure;
+}
+
+function renderNextPageBatch() {
+  if (!activeProject) return;
+  const flow = document.getElementById("detailPagesFlow");
+  const pages = activeProject.pages || [];
+  const nextPages = pages.slice(renderedPageCount, renderedPageCount + DETAIL_BATCH_SIZE);
+
+  nextPages.forEach((src, index) => {
+    flow.appendChild(createDetailShot(src, renderedPageCount + index, activeProject));
+  });
+
+  renderedPageCount += nextPages.length;
+  syncLoadMoreButton();
+}
+
+function hasMorePages() {
+  if (!activeProject) return false;
+  return renderedPageCount < (activeProject.pages || []).length;
+}
+
+function syncLoadMoreButton() {
+  const button = document.getElementById("detailLoadMore");
+  const counters = document.querySelectorAll(".detail-load-more-count");
+  if (!button || !counters.length || !activeProject) return;
+
+  const remaining = Math.max(0, (activeProject.pages || []).length - renderedPageCount);
+  counters.forEach((counter) => {
+    counter.textContent = String(remaining);
+  });
+  button.hidden = remaining === 0;
+}
+
+function initLoadMoreObserver() {
+  if (loadMoreObserver) {
+    loadMoreObserver.disconnect();
+  }
+
+  const sentinel = document.getElementById("detailLoadSentinel");
+  if (!sentinel) return;
+
+  loadMoreObserver = new IntersectionObserver((entries) => {
+    const shouldLoad = entries.some((entry) => entry.isIntersecting);
+    if (!shouldLoad || !hasMorePages()) return;
+    renderNextPageBatch();
+  }, {
+    rootMargin: "800px 0px"
+  });
+
+  loadMoreObserver.observe(sentinel);
+}
+
 function introAnimation() {
-  gsap.from(".detail-marquee, .detail-bezel, .detail-controls", {
+  if (!animationLib) return;
+
+  animationLib.from(".detail-marquee, .detail-bezel, .detail-controls", {
     y: 18,
     opacity: 0,
     duration: 0.8,
@@ -152,7 +256,7 @@ function introAnimation() {
     stagger: 0.08
   });
 
-  gsap.from(".detail-primary, .detail-sidebar-panel", {
+  animationLib.from(".detail-primary, .detail-sidebar-panel", {
     y: 24,
     opacity: 0,
     duration: 0.7,
@@ -261,6 +365,8 @@ animateRain();
 setLanguage("zh");
 introAnimation();
 initBgm();
+
+document.getElementById("detailLoadMore")?.addEventListener("click", renderNextPageBatch);
 
 window.addEventListener("resize", resizeCanvas);
 langButtons.forEach((button) => {

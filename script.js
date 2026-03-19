@@ -1,4 +1,9 @@
-gsap.registerPlugin(ScrollTrigger);
+const animationLib = window.gsap || null;
+const scrollPlugin = window.ScrollTrigger || null;
+
+if (animationLib && scrollPlugin) {
+  animationLib.registerPlugin(scrollPlugin);
+}
 
 const siteData = window.PORTFOLIO_DATA || { tools: [], experiences: [], projects: [] };
 
@@ -33,6 +38,14 @@ const BGM_SRC = "./audio/stardew-valley.mp3";
 const BGM_STATE_KEY = "portfolio-bgm";
 const BGM_TIME_KEY = "portfolio-bgm-time";
 
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
 function resizeCanvases() {
   particleCanvas.width = window.innerWidth;
   particleCanvas.height = window.innerHeight;
@@ -43,12 +56,12 @@ function resizeCanvases() {
   settledSnow = Array.from({ length: snowCols }, () => []);
   clearingSnow = false;
   rainDrops = Array.from({ length: Math.max(24, Math.floor(window.innerWidth / 50)) }, () => ({
-    x: gsap.utils.random(0, rainCanvas.width),
-    y: gsap.utils.random(-rainCanvas.height, rainCanvas.height),
+    x: randomBetween(0, rainCanvas.width),
+    y: randomBetween(-rainCanvas.height, rainCanvas.height),
     size: snowCell,
-    speed: gsap.utils.random(0.45, 2.9),
-    alpha: gsap.utils.random(0.08, 0.18),
-    color: gsap.utils.random(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"])
+    speed: randomBetween(0.45, 2.9),
+    alpha: randomBetween(0.08, 0.18),
+    color: pickRandom(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"])
   }));
 }
 
@@ -86,7 +99,7 @@ function renderProjects() {
     return `
       <${cardTag} class="gallery-card ${extraClass}" data-gallery-card data-index="${index}" ${hrefAttr}>
         <div class="gallery-screen">
-          ${project.cover ? `<img class="gallery-image" src="${project.cover}" alt="${project.titleEn}">` : `<div class="gallery-placeholder" aria-hidden="true"></div>`}
+          ${project.cover ? `<img class="gallery-image" src="${project.cover}" alt="${project.titleEn}" loading="lazy" decoding="async">` : `<div class="gallery-placeholder" aria-hidden="true"></div>`}
         </div>
         <div class="gallery-meta">
           <span class="gallery-stage">Stage ${project.stage}</span>
@@ -122,8 +135,8 @@ function setLanguage(lang) {
 }
 
 function createBreathingLoop() {
-  if (!pixelSprite || !spriteShadow) return;
-  gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 1.8, ease: "sine.inOut" } })
+  if (!pixelSprite || !spriteShadow || !animationLib) return;
+  animationLib.timeline({ repeat: -1, yoyo: true, defaults: { duration: 1.8, ease: "sine.inOut" } })
     .to(pixelSprite, { scaleX: 1.04, scaleY: 0.96, transformOrigin: "center bottom" })
     .to(spriteShadow, { scaleX: 0.92, opacity: 0.18 }, 0);
 }
@@ -146,11 +159,11 @@ function createParticles(rect) {
         y: centerY + offsetY,
         size: pixelSize,
         color: isEyePixel ? "#ffffff" : "#111111",
-        vx: offsetX * 0.08 + gsap.utils.random(-3, 3),
-        vy: offsetY * 0.08 + gsap.utils.random(-6, -2),
-        gravity: gsap.utils.random(0.12, 0.22),
+        vx: offsetX * 0.08 + randomBetween(-3, 3),
+        vy: offsetY * 0.08 + randomBetween(-6, -2),
+        gravity: randomBetween(0.12, 0.22),
         alpha: 1,
-        decay: gsap.utils.random(0.012, 0.024)
+        decay: randomBetween(0.012, 0.024)
       });
     }
   }
@@ -188,14 +201,14 @@ function animateRain() {
       drop.y = targetY;
       if (settledSnow[col].length < snowRows) {
         settledSnow[col].push({
-          color: gsap.utils.random(snowPalette),
-          alpha: gsap.utils.random(0.16, 0.28)
+          color: pickRandom(snowPalette),
+          alpha: randomBetween(0.16, 0.28)
         });
       }
-      drop.y = -drop.size - gsap.utils.random(0, rainCanvas.height * 0.2);
-      drop.x = gsap.utils.random(0, rainCanvas.width);
-      drop.alpha = gsap.utils.random(0.08, 0.18);
-      drop.color = gsap.utils.random(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"]);
+      drop.y = -drop.size - randomBetween(0, rainCanvas.height * 0.2);
+      drop.x = randomBetween(0, rainCanvas.width);
+      drop.alpha = randomBetween(0.08, 0.18);
+      drop.color = pickRandom(["255, 255, 255", "188, 188, 188", "124, 124, 124", "68, 68, 68"]);
     }
 
     rainCtx.fillStyle = `rgba(${drop.color}, ${drop.alpha})`;
@@ -214,10 +227,10 @@ function animateRain() {
   const tallestStack = settledSnow.length ? Math.max(...settledSnow.map((stack) => stack.length)) : 0;
   if (!clearingSnow && tallestStack >= snowRows) {
     clearingSnow = true;
-    gsap.delayedCall(0.35, () => {
+    window.setTimeout(() => {
       settledSnow = Array.from({ length: snowCols }, () => []);
       clearingSnow = false;
-    });
+    }, 350);
   }
 
   requestAnimationFrame(animateRain);
@@ -230,15 +243,22 @@ function revealMainContent() {
   audioToggle.classList.add("is-visible");
   document.body.classList.add("is-ready");
   landing.style.display = "none";
-  ScrollTrigger.refresh();
+  if (scrollPlugin) {
+    scrollPlugin.refresh();
+  }
 }
 
 function enterWithoutLanding() {
   if (!landing || !langToggle || !siteMain || !pixelSprite || !spriteShadow) return;
   landing.classList.add("is-hidden");
   landing.style.display = "none";
-  gsap.set(pixelSprite, { autoAlpha: 0 });
-  gsap.set(spriteShadow, { autoAlpha: 0 });
+  if (animationLib) {
+    animationLib.set(pixelSprite, { autoAlpha: 0 });
+    animationLib.set(spriteShadow, { autoAlpha: 0 });
+  } else {
+    pixelSprite.style.opacity = "0";
+    spriteShadow.style.opacity = "0";
+  }
   revealMainContent();
 }
 
@@ -255,7 +275,13 @@ function playEntrance() {
   burstPlayed = true;
   createParticles(pixelSprite.getBoundingClientRect());
 
-  gsap.timeline()
+  if (!animationLib) {
+    drawParticles();
+    revealMainContent();
+    return;
+  }
+
+  animationLib.timeline()
     .to(spriteButton, { y: -26, scaleX: 0.96, scaleY: 1.05, duration: 0.22, ease: "power2.out" })
     .to(spriteShadow, { scaleX: 0.78, opacity: 0.08, duration: 0.22, ease: "power2.out" }, "<")
     .to(spriteButton, { y: 0, scaleX: 1.04, scaleY: 0.96, duration: 1.1, ease: "elastic.out(1, 0.45)" })
@@ -274,8 +300,16 @@ function playEntrance() {
 }
 
 function initScrollAnimations() {
-  gsap.utils.toArray(".content-card").forEach((card) => {
-    gsap.fromTo(card, {
+  if (!animationLib || !scrollPlugin) {
+    document.querySelectorAll(".content-card").forEach((card) => {
+      card.style.opacity = "1";
+      card.style.transform = "translateY(0)";
+    });
+    return;
+  }
+
+  animationLib.utils.toArray(".content-card").forEach((card) => {
+    animationLib.fromTo(card, {
       y: 28,
       opacity: 0
     }, {
@@ -295,18 +329,24 @@ function setProjectStack() {
   const cards = [...document.querySelectorAll("[data-gallery-card]")];
   cards.forEach((card, index) => {
     const rotation = index % 2 === 0 ? -0.65 : 0.65;
-    gsap.set(card, {
-      rotation,
-      transformOrigin: "center bottom"
-    });
+    if (animationLib) {
+      animationLib.set(card, {
+        rotation,
+        transformOrigin: "center bottom"
+      });
+    } else {
+      card.style.transformOrigin = "center bottom";
+      card.style.transform = `rotate(${rotation}deg)`;
+    }
   });
 }
 
 function bindProjectStack() {
+  if (!animationLib) return;
   const cards = [...document.querySelectorAll("[data-gallery-card]")];
   cards.forEach((card) => {
     card.addEventListener("mouseenter", () => {
-      gsap.to(card, {
+      animationLib.to(card, {
         y: -10,
         rotation: 0,
         duration: 0.22,
@@ -316,7 +356,7 @@ function bindProjectStack() {
 
     card.addEventListener("mouseleave", () => {
       const index = Number(card.dataset.index || 0);
-      gsap.to(card, {
+      animationLib.to(card, {
         y: 0,
         rotation: index % 2 === 0 ? -0.65 : 0.65,
         duration: 0.22,
@@ -435,7 +475,9 @@ if (searchParams.get("entered") === "1") {
 window.addEventListener("resize", () => {
   resizeCanvases();
   setProjectStack();
-  ScrollTrigger.refresh();
+  if (scrollPlugin) {
+    scrollPlugin.refresh();
+  }
 });
 
 if (spriteButton) {

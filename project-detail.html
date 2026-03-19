@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -27,7 +27,7 @@
     <audio id="bgmAudio" loop preload="none"></audio>
 
     <aside class="bgm-credit">
-      <p data-lang="zh">关于 BGM：选用了我最喜欢的《星露谷物语》序曲（Overture）。这首曲子陪伴我度过了很多创作时光，希望它的治愈感也能带给你良好的观看体验。</p>
+      <p data-lang="zh">关于 BGM：选用了我很喜欢的《星露谷物语》序曲（Overture）。这首曲子陪伴我度过了很多创作时光，希望它的治愈感也能带给你良好的观看体验。</p>
       <p data-lang="en">About the BGM: I chose my favorite Stardew Valley track, Overture. It has accompanied many of my creative hours, and I hope its gentle feeling brings you a warm viewing experience too.</p>
       <p class="bgm-credit__note">Music by ConcernedApe | 感谢这位天才开发者的慷慨授权。</p>
     </aside>
@@ -42,7 +42,7 @@
           <section class="detail-screen">
             <div class="detail-toolbar">
               <a class="detail-back" href="./index.html?entered=1">
-                <span data-lang="zh">Back To Lobby</span>
+                <span data-lang="zh">返回首页</span>
                 <span data-lang="en">Back To Lobby</span>
               </a>
               <div class="detail-nav" id="detailNav"></div>
@@ -127,6 +127,13 @@
                   <p class="detail-kicker" data-lang="en">Full Portfolio Pages</p>
                 </div>
                 <div class="detail-pages-flow" id="detailPagesFlow"></div>
+                <div class="detail-pages-actions">
+                  <button type="button" class="detail-load-more" id="detailLoadMore">
+                    <span data-lang="zh">继续加载剩余页面（<span class="detail-load-more-count">0</span>）</span>
+                    <span data-lang="en">Load more pages (<span class="detail-load-more-count">0</span>)</span>
+                  </button>
+                </div>
+                <div class="detail-load-sentinel" id="detailLoadSentinel" aria-hidden="true"></div>
               </section>
             </article>
           </section>
@@ -151,8 +158,8 @@
     </main>
   </div>
 
-  <script src="./portfolio-data.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
-  <script src="./project-detail.js"></script>
+  <script src="./vendor/gsap/gsap.min.js" defer></script>
+  <script src="./portfolio-data.js" defer></script>
+  <script src="./project-detail.js" defer></script>
 </body>
 </html>
